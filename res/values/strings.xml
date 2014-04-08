@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Word Chain</string>    
+    <string name="action_settings">Settings</string>
+    <string name="score">Score</string>
+    <string name="best">Best</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="hello_world">Hello world!</string>
+    
+    <string name="new_game">New Game</string>
+    <string name="resume_game">Resume Game</string>
+    <string name="achievements">Achievements</string>
+    <string name="leaderboard">High Scores</string>
+    <string name="game_over">Game Over!</string>
+    <string name="share">Share</string>
+    <string name="rate">Rate App</string>
+    
+    <string name="send_to">Choose an app to share:</string>
+    <string name="share_content">I am playing Word Chain to challenge my vocabulary.\n\nSee it at Play Store: https://play.google.com/store/apps/details?id=com.z299studio.wordchain</string>
+    
+    <string name="repeat_title">Repeat Word</string>
+    <string name="not_a_word">That is NOT an English word.\n\nStatistics\n</string>
+    <string name="max_used">\nMost used word initial letter:</string>
+    <string name="min_used">\nLeast used word initial letter:</string>
+    <string name="word_count_12">\nWords longer than 12 letters:</string>
+    <string name="word_count_6">\nWords between 6 and 12 letters:</string>
+    <string name="word_count_1">\nWords shorter than 6 letters:</string>
+    
+    <string name="repeat_input">You have already got this word in this round. Make another choice.</string>
+	
+    <string name="reset_ask1">A saved game is found, are you sure to start a new game?</string>
+    <string name="reset_ask2">The current progress will be discarded, are you sure to start a new game?</string>
+    
+    <string name="get_achievement">Get Achievement</string>
+</resources>

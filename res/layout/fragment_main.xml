@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:background="@color/background">
+
+     <Button android:id="@+id/new_game"
+  		android:onClick="onNewGame"
+  		android:text="@string/new_game"
+        android:paddingLeft="@dimen/home_button_left"
+  		android:layout_gravity="center_horizontal"
+  		android:drawableLeft="@drawable/games_new_white"
+  		android:layout_marginTop="@dimen/home_button_margin"
+        android:layout_height="@dimen/home_button_height"
+        android:layout_width="@dimen/home_button_width"
+        style="@style/AppButton"/>
+    
+    <Button 
+        android:onClick="onAchievement"
+        android:text="@string/achievements"
+        android:layout_gravity="center_horizontal"
+        android:paddingLeft="@dimen/home_button_left"
+        android:drawableLeft="@drawable/games_achievements_white"
+  		android:layout_marginTop="@dimen/home_button_margin"
+        android:layout_height="@dimen/home_button_height"
+        android:layout_width="@dimen/home_button_width"
+		style="@style/AppButton"/>
+    
+    <Button 
+        android:onClick="onLeaderboard"
+        android:text="@string/leaderboard"
+        android:layout_gravity="center_horizontal"
+        android:paddingLeft="@dimen/home_button_left"
+        android:drawableLeft="@drawable/games_leaderboards_white"        
+  		android:layout_marginTop="@dimen/home_button_margin"
+        android:layout_height="@dimen/home_button_height"
+        android:layout_width="@dimen/home_button_width"
+        style="@style/AppButton"/>
+    
+</LinearLayout>
+
