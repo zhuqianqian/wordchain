@@ -268,7 +268,7 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 				R.string.achievement_love_to_play,  // 8
 				R.string.achievement_newbie,  // 9
 				R.string.achievement_obsess_over_it,  // 10
-				R.string.achievement_first_perfec_chain,  // 11
+				R.string.achievement_first_perfect_chain,  // 11
 				R.string.achievement_pupil,  // 12
 				R.string.achievement_secondary_school_student,  // 13
 				R.string.achievement_word_master,  // 14
@@ -278,7 +278,7 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 		public static final int NUMBER_LOVER = 20;
 		public String[] mAchievements;
 		public int[] mUnsync;
-		public String LB_ID = "CgkIoPWahPIEEAIQAA";
+		public String LB_ID;
 		
 		public int mHighScore;		
 		private char mStartChar;
@@ -301,6 +301,7 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 			for(int i = 0; i< mIntIds.length; ++i) {
 				mAchievements[i] = r.getString(mIntIds[i]);
 			}
+			LB_ID = r.getString(R.string.leaderboard_high_scores);
 			loadLocal();
 		}
 		public GameServiceManager(Context context, boolean useGameService) {
@@ -314,6 +315,7 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 				for(int i= 0; i < mIntIds.length; ++i) {
 					mAchievements[i] = r.getString(mIntIds[i]);
 				}
+				LB_ID = r.getString(R.string.leaderboard_high_scores);
 				loadLocal();
 			}
 		}
