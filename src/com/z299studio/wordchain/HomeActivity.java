@@ -118,17 +118,19 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 		    .setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int which) { 
 		        	mStatus = GAME_OVER;
+		        	switchFragment();
 		        }
 		     })
 
 		    .setNegativeButton(R.string.resume_game, new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int which) { 
 		        	mStatus = GAME_ONGOING;
+		        	switchFragment();
 		        }
 		     })
 		     .show();
 		}
-		switchFragment();
+		
 	}
 	
 	private void switchFragment() {
@@ -347,29 +349,43 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 				editor.putInt("LongWordRepeat", mWordlengthRepeat);
 				editor.putInt("WordCounter", mWordCounter);
 				editor.putInt("TotalScore", mTotalScore);
+				String value = "";
+				for(int i = 0; i < 26; ++i) {
+					if(mInitials[i]) {
+						value += String.valueOf((char)(i+'a'));
+					}
+				}
+				editor.putString("A2ZKeys", value);
 				editor.commit();
 			}
 		}
 		
 		public void loadProgress() {
 			if(mEnabled) {
+				String value;
 				mStartChar = mSP.getString("StartChar", "0").charAt(0);
 				mStartCharRepeat = mSP.getInt("StartCharRepeat", 0);
 				mPerfectInitial = mSP.getString("StartCharAZ",  "a").charAt(0);
 				mWordlengthRepeat = mSP.getInt("LongWordRepeat", 0);
 				mWordCounter = mSP.getInt("WordCounter", 0);
 				mTotalScore = mSP.getInt("TotalScore", 0);
+				value = mSP.getString("A2ZKeys", "");
+				int i, n = value.length();
+				for(i = 0; i < n; ++i) {
+					mInitials[value.charAt(i) - 'a'] = true;
+				}
 			}
 		}
 		
 		public void reset() {
 			if(mEnabled) {
-				mHighScore = 0;
+				mHighScore = mTotalScore = 0;
 				mStartChar = '0';
 				mStartCharRepeat = 0;
 				mPerfectInitial = 'a';
 				mWordlengthRepeat = 0;
 				mDeleteUsed = false;
+				mWordCounter = 0;
 				mWordCounter = 0;
 				for(int i = 0; i< 26; ++i) {
 					mInitials[i] = false;
@@ -540,7 +556,7 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 	@Override
 	public void onGameOver(int score) {
 		mGSM.gameOverCheck(this, score);
-		
+		mGSM.reset();
 	}
 
 	@Override

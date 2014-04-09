@@ -94,8 +94,10 @@ public class GameFragment extends Fragment implements InputView.OnInputListener,
 			String s = HomeActivity.SP.getString(HomeActivity.ITEM_USER_INPUT, "hello");
 			mKeyboard.restore(s);
 			restoreHistory();
+			mListener.loadProgress();
 		}
 		else {
+			resetGame();
 			mScoreView.setText(String.valueOf(0));
 			mText = mDataHelper.getText(RNG.nextInt(56088));
 			mHistory.put(mText, Boolean.valueOf(true));
@@ -109,7 +111,6 @@ public class GameFragment extends Fragment implements InputView.OnInputListener,
 		Animation ani = AnimationUtils.loadAnimation((Context)mActivity, android.R.anim.fade_out);
 		ani.setAnimationListener(this);
 		mBonusView.setOutAnimation(ani);
-		mListener.loadProgress();
 		mWordView.setText(mText);
     }
 	
@@ -133,6 +134,16 @@ public class GameFragment extends Fragment implements InputView.OnInputListener,
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		mLengthSpan[0] = HomeActivity.SP.getInt("STAT0", 0);
+		mLengthSpan[1] = HomeActivity.SP.getInt("STAT1", 0);
+		mLengthSpan[2] = HomeActivity.SP.getInt("STAT2", 0);
+		String s = HomeActivity.SP.getString("STATInit", "");
+		String ss[] = s.split(",");
+		if(ss.length > 0) {
+			for(int i = 0; i < 26; i++) {
+				mInitialStat[i] = Integer.valueOf(ss[i]);
+			}
+		}
 	}
 	
 	public void resetGame() {
@@ -145,6 +156,10 @@ public class GameFragment extends Fragment implements InputView.OnInputListener,
 		mHistory.put(mText, Boolean.valueOf(true));
 		mWordView.setText(mText);
 		mActivity.mStatus = HomeActivity.GAME_ONGOING;
+		mLengthSpan[0] = mLengthSpan[1] = mLengthSpan[2] = 0;
+		for(int i = 0; i < 26; i++) {
+			mInitialStat[i] = 0;
+		}
 	}
 	
 	@Override
@@ -181,7 +196,7 @@ public class GameFragment extends Fragment implements InputView.OnInputListener,
 			mBonusView.setText("+"+mBonusSpan[bonus]);
 			mScore += mBonusSpanInt[bonus];
 		}
-		mListener.onCheck(text, len, false);
+		mListener.onCheck(text, (len+mBonusSpanInt[bonus]), false);
 		mScoreView.setText(String.valueOf(mScore));
 		mWordView.setText(text);
 		return true;
@@ -239,6 +254,7 @@ public class GameFragment extends Fragment implements InputView.OnInputListener,
 			}
 		})
 	     .show();
+		mHistory.clear();
 		mActivity.mStatus = HomeActivity.GAME_OVER;
 		if(mScore > mBest) {
 			mEdit = HomeActivity.SP.edit();
@@ -259,6 +275,14 @@ public class GameFragment extends Fragment implements InputView.OnInputListener,
 		mEdit.putInt(HomeActivity.ITEM_GAME_STATUS, mActivity.mStatus);
 		mEdit.putString(HomeActivity.ITEM_LAST_WORD, mText);
 		mEdit.putString(HomeActivity.ITEM_USER_INPUT, mKeyboard.mTextView.getText().toString());
+		mEdit.putInt("STAT0", mLengthSpan[0]);
+		mEdit.putInt("STAT1", mLengthSpan[1]);
+		mEdit.putInt("STAT2", mLengthSpan[2]);
+		String value = "";
+		for(int i : mInitialStat) {
+			value += String.valueOf(i) + ",";
+		}
+		mEdit.putString("STATInit", value);
 		mEdit.commit();
 		
 		try {
