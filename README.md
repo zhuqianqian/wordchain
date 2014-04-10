@@ -1,7 +1,7 @@
 # Word Chain
 A simple puzzle game on English words.
 
-### Contributtions
+### Contributions
 
 
 ##License
