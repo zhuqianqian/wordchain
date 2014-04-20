@@ -76,9 +76,7 @@ public class GameFragment extends Fragment implements InputView.OnInputListener,
 		for(int i = 0; i < ids.length; ++i) {
 			mSentences[i] = r.getString(ids[i]);
 		}
-//		mActivity.mActionBar.setDisplayHomeAsUpEnabled(true);
-		mActivity.mActionBar.setHomeButtonEnabled(true);
-		mActivity.mActionBar.setIcon(R.drawable.home_back);
+		mActivity.mActionBar.setDisplayHomeAsUpEnabled(true);
         return v;
     }
     

@@ -18,8 +18,7 @@ public class MenuFragment extends Fragment {
 		View v = inflater.inflate(R.layout.fragment_main, container, false);
 		mActivity = (HomeActivity)getActivity();
 		mButtonNew = (Button)v.findViewById(R.id.new_game);
-		mActivity.mActionBar.setHomeButtonEnabled(false);
-		mActivity.mActionBar.setIcon(R.drawable.ic_launcher);
+		mActivity.mActionBar.setDisplayHomeAsUpEnabled(false);
 		return v;
 	}
 	

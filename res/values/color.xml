@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- #<alpha><R><G><B> -->   
-    <color name="background">#ffff9e5a</color>
+    <color name="background">#ff28a232</color>
     <color name="white">#ffffffff</color>
     <color name="key_pressed">#ff7cc1fe</color>
     <color name="bonus">#ffff0000</color>

@@ -219,7 +219,7 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 	    	break;
 	    	
 	    case android.R.id.home: {
-	    	getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mMenuFragment).commit();
+	    	onBackPressed();
 	    	}
 	    	break;
 	    
