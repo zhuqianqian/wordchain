@@ -23,7 +23,7 @@ public class InputView extends View implements OnTouchListener {
 	private int mHeight, mWidth;
 	private Paint mPaintLine = new Paint();
 	private Paint mPaintText = new Paint();
-	private int mBtnGap = 1;
+	private int mBtnGap;
 	private int mTileX, mTileY, mTileX1, mTileY1;
 	protected OnInputListener mListener;
 	private int mMinKeyHeight;
@@ -66,7 +66,7 @@ public class InputView extends View implements OnTouchListener {
 		mMinKeyHeight = (int) (r.getDimension(R.dimen.min_key_height) + 0.5f);
 		mKeyTextSize = (int) (r.getDimension(R.dimen.key_text_size)+0.5f);
 		mColorPressed = r.getColor(R.color.key_pressed);
-		
+		mBtnGap = (int)(r.getDimension(R.dimen.key_x_interval) + 0.5f);
 		setOnTouchListener(this);
 	}
 	public void setPaint(int maxChar, int color, int size) {
