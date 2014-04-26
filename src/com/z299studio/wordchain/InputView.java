@@ -101,8 +101,8 @@ public class InputView extends View implements OnTouchListener {
 	protected void measureSize() {
 		if(mWidth >0 ) {
 			int i;
-			mTileX = mWidth / 10 - 1;
-			mTileY = mHeight / 3 - 1;
+			mTileX = mWidth / 10 - mBtnGap;
+			mTileY = mHeight / 3 - mBtnGap;
 			if(mTileY > mTileX) {
 				mTileY = mTileX;
 			}

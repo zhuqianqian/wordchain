@@ -17,6 +17,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.z299studio.wordchain.HomeActivity"
+            android:logo="@drawable/ic_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
