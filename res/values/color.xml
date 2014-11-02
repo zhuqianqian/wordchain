@@ -5,4 +5,8 @@
     <color name="white">#ffffffff</color>
     <color name="key_pressed">#ff7cc1fe</color>
     <color name="bonus">#ffff0000</color>
+    
+    <color name="primary">#ff5722</color>
+    <color name="primary_darker">#e64a19</color>
+    <color name="accent">#ff5722</color>
 </resources>
