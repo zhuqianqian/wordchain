@@ -1,17 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
     tools:context=".HomeActivity" >
     
-    <include layout="@layout/toolbar"/>
-
+    <LinearLayout
+	    android:id="@+id/toolbar"
+	    android:layout_height="@dimen/actionbarSize"
+	    android:layout_width="match_parent"
+	    android:orientation="horizontal"
+	    android:gravity="center_vertical"
+	    android:paddingLeft="@dimen/activity_horizontal_margin"
+	    android:paddingRight="@dimen/activity_horizontal_margin"
+	    android:background="@color/primary">
+        
+        <ImageView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/app_name"
+            android:layout_weight="2"
+            android:scaleType="fitStart"
+            android:src="@drawable/ic_launcher"/>
+        
+        <ImageView android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:contentDescription="@string/new_game"
+            android:scaleType="center"
+            android:src="@drawable/games_new_white"/>
+        
+        <ImageView android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:contentDescription="@string/share"
+            android:src="@drawable/ic_action_share"/>
+        
+        <ImageView android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:contentDescription="@string/new_game"
+            android:scaleType="center"
+            android:src="@drawable/ic_action_good"/>
+        
+    </LinearLayout>
+    
+    <RelativeLayout 
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <TextView
         android:id="@+id/text_score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textAppearance="@style/TA.Body1"
         android:layout_alignParentLeft="true"
         android:text="@string/score" />
     
@@ -19,7 +63,7 @@
         android:id="@+id/text_best"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textAppearance="@style/TA.Body1"
         android:layout_alignParentRight="true"
         android:text="@string/best" />
     
@@ -31,12 +75,12 @@
         <TextView 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.SubHead"/>
+            android:textAppearance="@style/TA.Subhead"/>
          
         <TextView 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.SubHead"/>
+            android:textAppearance="@style/TA.Subhead"/>
     </TextSwitcher>
     
     <TextSwitcher 
@@ -52,14 +96,14 @@
             android:layout_height="wrap_content"
             android:textColor="@color/bonus"
             android:textStyle="italic|bold"
-            android:textAppearance="@style/TextAppearance.AppCompat.SubHead"
+            android:textAppearance="@style/TA.Subhead"
             />
         <TextView 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/bonus"
             android:textStyle="italic|bold"
-            android:textAppearance="@style/TextAppearance.AppCompat.SubHead"
+            android:textAppearance="@style/TA.Subhead"
             />
     </TextSwitcher>
     
@@ -69,7 +113,7 @@
         android:layout_height="wrap_content"        
         android:layout_alignParentRight="true"
         android:layout_below="@id/text_best"
-        android:textAppearance="@style/TextAppearance.AppCompat.SubHead"/>
+        android:textAppearance="@style/TA.Subhead"/>
     
     <TextView 
         android:id="@+id/word"
@@ -78,13 +122,15 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/score"        
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+        android:textAppearance="@style/TA.Headline"/>
    
     <EditText android:id="@+id/input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="TextAppearance.AppCompat.Display1"
+        android:layout_below="@id/word"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TA.Display1"
         android:inputType="textPassword"
         />
-    
-</RelativeLayout>
+    </RelativeLayout>
+</LinearLayout>

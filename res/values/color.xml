@@ -9,4 +9,6 @@
     <color name="primary">#ff5722</color>
     <color name="primary_darker">#e64a19</color>
     <color name="accent">#ff5722</color>
+    
+     <color name="text_black_std">#de000000</color>
 </resources>

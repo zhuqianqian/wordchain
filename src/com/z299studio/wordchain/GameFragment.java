@@ -46,13 +46,12 @@ public class GameFragment extends Fragment implements InputView.OnInputListener,
 	private TextSwitcher mScoreView, mBonusView;
 	private TextView mWordView;
 	private int mScore, mBest;
-	DatabaseHelper mDataHelper;
 	private String mText;
-	SharedPreferences.Editor mEdit;
-	private static final String DATA_FILE = "data";
-	private HomeActivity mActivity;
 	private Hashtable<String, Boolean> mHistory = new Hashtable<String, Boolean>();
 	private static final Random RNG = new Random();
+	private static final String DATA_FILE = "data";
+	private HomeActivity mActivity;
+	
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

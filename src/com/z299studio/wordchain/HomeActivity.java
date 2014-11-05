@@ -1,9 +1,12 @@
 package com.z299studio.wordchain;
 
 import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Random;
 
 import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.BaseGameActivity;
+import com.z299studio.wordchain.GameFragment.GameListener;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +22,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextSwitcher;
+import android.widget.TextView;
 
 public class HomeActivity extends BaseGameActivity implements GameFragment.GameListener {
 	
@@ -38,9 +44,22 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 	
 	protected DatabaseHelper mDBH;
 	protected boolean mUseGoogleService;
-	
-	private GameFragment mGameFragment;
-	private MenuFragment mMenuFragment;
+	protected String mSentences[] = new String[6];
+	protected int mInitialStat[] = new int[26];
+	protected int mLengthSpan[] = {0, 0, 0};
+	protected boolean mIgnoreAni;
+	protected boolean mAniStarted;
+	private int mBonusSpanInt[] = {0, 3, 8};
+	private String mBonusSpan[] = {null, "3 !", "8 !"};
+	private GameListener mListener;
+	private EditText mKeyboard;
+	private TextView  mBestView;
+	private TextSwitcher mScoreView, mBonusView;
+	private TextView mWordView;
+	private int mScore, mBest;
+	private String mText;
+	private Hashtable<String, Boolean> mHistory = new Hashtable<String, Boolean>();
+	private static final Random RNG = new Random();
 	
 	public ActionBar mActionBar;
 
@@ -48,12 +67,6 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		mActionBar = getActionBar();
-		mGameFragment = new GameFragment();
-		mMenuFragment = new MenuFragment();
-		mGameFragment.setListner(this);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
-                mMenuFragment).commit();
 		SP = this.getSharedPreferences(SP_FILE, 0);
 		mUseGoogleService = SP.getBoolean(ITEM_GOOGLE_GAMES, false);
 		mGSM = new GameServiceManager(this, mUseGoogleService);
@@ -68,45 +81,49 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 		}
 	}
 	
-	public DatabaseHelper getDatabaseHelper() {
-		return mDBH;
+	protected void initUiControls() {
+		mKeyboard = (EditText)findViewById(R.id.input);
+		mWordView = (TextView)findViewById(R.id.word);
+		mScoreView = (TextSwitcher)findViewById(R.id.score);
+		mBonusView = (TextSwitcher)findViewById(R.id.bonus);
+		mBestView = (TextView)findViewById(R.id.best);
+		mBest = SP.getInt(ITEM_GAME_BEST, 0);
+		mBestView.setText(String.valueOf(mBest));
 	}
 	
 	public void onNewGame(View v) {
-		if(v!=null) {
-			switchFragment();
+		if(mStatus == GAME_ONGOING) {
+			new AlertDialog.Builder(HomeActivity.this)
+				.setTitle(R.string.new_game)
+				.setMessage(R.string.reset_ask2)
+				.setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) { 
+						resetGame();
+					}
+				})
+				.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) { 
+					}
+				})
+				.show();
 		}
 		else {
-			GameFragment gf;
-			try {
-				gf = (GameFragment)getSupportFragmentManager().findFragmentByTag("TAG_GAME");
-				if(gf!=null) {
-					if(mStatus == GAME_ONGOING) {
-						new AlertDialog.Builder(HomeActivity.this)
-					    .setTitle(R.string.new_game)
-					    .setMessage(R.string.reset_ask2)
-					    .setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
-					        public void onClick(DialogInterface dialog, int which) { 
-					        	mGameFragment.resetGame();
-					        }
-					     })
-					    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-					        public void onClick(DialogInterface dialog, int which) { 
-					            // do nothing
-					        }
-					     })
-					     .show();
-					}
-					else {
-						gf.resetGame();
-					}
-				}
-				else {
-					startGame();
-				}
-			} catch(ClassCastException e) {
-				startGame();
-			}
+			resetGame();
+		}
+	}
+	
+	protected void resetGame() {
+		mHistory.clear();
+		mScore = 0;
+		mScoreView.setText(String.valueOf(0));
+		mText = mDBH.getText(RNG.nextInt(56088));
+		mKeyboard.setText(mText.charAt(mText.length()-1));
+		//mHistory.put(mText, Boolean.valueOf(true));
+		mWordView.setText("");
+		mStatus = GAME_ONGOING;
+		mLengthSpan[0] = mLengthSpan[1] = mLengthSpan[2] = 0;
+		for(int i = 0; i < 26; i++) {
+			mInitialStat[i] = 0;
 		}
 	}
 	
@@ -131,15 +148,6 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 		     .show();
 		}
 		
-	}
-	
-	private void switchFragment() {
-		FragmentTransaction ft = 
-		getSupportFragmentManager().beginTransaction();
-		ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-		ft.replace(R.id.fragment_container, mGameFragment, "TAG_GAME");
-		ft.addToBackStack(null);
-        ft.commit();
 	}
 	
 	public void onAchievement(View v) {

@@ -1,0 +1,21 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppBaseTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_darker</item>
+        <item name="android:colorAccent">@color/accent</item>
+    </style>
+
+    <style name="AppTheme" parent="AppBaseTheme"/>
+    
+    <style name="TA" parent="@android:style/TextAppearance.Material"/>
+    
+    <style name="TA.Subhead" parent="@android:style/TextAppearance.Material.Subhead"/>
+    
+    <style name="TA.Display1" parent="@android:style/TextAppearance.Material.Display1"/>
+    
+    <style name="TA.Body1" parent="@android:style/TextAppearance.Material.Body1"/>
+    
+    <style name="TA.Headline" parent="@android:style/TextAppearance.Material.Headline"/>
+
+</resources>
