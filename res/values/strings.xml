@@ -15,6 +15,7 @@
     <string name="game_over">Game Over!</string>
     <string name="share">Share</string>
     <string name="rate">Rate App</string>
+    <string name="ok">OK</string>
     
     <string name="send_to">Choose an app to share:</string>
     <string name="share_content">I am playing Word Chain to challenge my vocabulary.\n\nSee it at Play Store: https://play.google.com/store/apps/details?id=com.z299studio.wordchain</string>

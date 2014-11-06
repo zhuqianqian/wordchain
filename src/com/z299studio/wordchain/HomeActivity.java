@@ -1,16 +1,17 @@
 package com.z299studio.wordchain;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Random;
 
 import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.BaseGameActivity;
-import com.z299studio.wordchain.GameFragment.GameListener;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -18,16 +19,21 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.support.v4.app.FragmentTransaction;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
-public class HomeActivity extends BaseGameActivity implements GameFragment.GameListener {
+public class HomeActivity extends BaseGameActivity implements AnimationListener, TextWatcher{
 	
+	private static final String DATA_FILE = "data";
 	public static final String SP_FILE = "game";
 	public static final String ITEM_GAME_STATUS = "Status";
 	public static final String ITEM_GAME_SCORE = "Score";
@@ -51,17 +57,16 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 	protected boolean mAniStarted;
 	private int mBonusSpanInt[] = {0, 3, 8};
 	private String mBonusSpan[] = {null, "3 !", "8 !"};
-	private GameListener mListener;
 	private EditText mKeyboard;
 	private TextView  mBestView;
 	private TextSwitcher mScoreView, mBonusView;
 	private TextView mWordView;
 	private int mScore, mBest;
 	private String mText;
+	private String mFirstLetter;
 	private Hashtable<String, Boolean> mHistory = new Hashtable<String, Boolean>();
 	private static final Random RNG = new Random();
 	
-	public ActionBar mActionBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,22 +78,77 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 		mStatus = SP.getInt(ITEM_GAME_STATUS, GAME_OVER);
 		mHelper.setConnectOnStart(mUseGoogleService);
 		mDBH = new DatabaseHelper(this);
+		
 		try {
 			mDBH.createDatabase();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		initUiControls();
 	}
 	
 	protected void initUiControls() {
 		mKeyboard = (EditText)findViewById(R.id.input);
+		mKeyboard.addTextChangedListener(this);
 		mWordView = (TextView)findViewById(R.id.word);
 		mScoreView = (TextSwitcher)findViewById(R.id.score);
 		mBonusView = (TextSwitcher)findViewById(R.id.bonus);
 		mBestView = (TextView)findViewById(R.id.best);
 		mBest = SP.getInt(ITEM_GAME_BEST, 0);
 		mBestView.setText(String.valueOf(mBest));
+		
+		if(mStatus == GAME_ONGOING) {
+			mText = HomeActivity.SP.getString(HomeActivity.ITEM_LAST_WORD, "hello");
+			mScore = HomeActivity.SP.getInt(HomeActivity.ITEM_GAME_SCORE, 0);			
+			mScoreView.setText(String.valueOf(mScore));
+			String s = HomeActivity.SP.getString(HomeActivity.ITEM_USER_INPUT, "");
+			mKeyboard.setText(s);
+			mKeyboard.setSelection(s.length());
+			restoreHistory();
+			mGSM.loadProgress();
+		}
+		else {
+			resetGame();
+		}
+		
+		mScoreView.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.flip_in));
+		mScoreView.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.flip_out));
+		
+		mBonusView.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+		Animation ani = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
+		ani.setAnimationListener(this);
+		mBonusView.setOutAnimation(ani);
+		mWordView.setText(mText);
+	}
+	
+	protected void restoreHistory() {
+		try {
+			File file = new File(getFilesDir()+"/"+DATA_FILE);
+			long size = file.length();
+			byte[] buffer = new byte[(int) size];
+			FileInputStream fis = openFileInput(DATA_FILE);
+			fis.read(buffer);
+			fis.close();
+			String s = new String(buffer, "UTF-8");
+			String keys[] = s.split("\n");
+			for(String k : keys) {
+				mHistory.put(k, Boolean.valueOf(true));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		mLengthSpan[0] = SP.getInt("STAT0", 0);
+		mLengthSpan[1] = SP.getInt("STAT1", 0);
+		mLengthSpan[2] = SP.getInt("STAT2", 0);
+		String s = SP.getString("STATInit", "");
+		String ss[] = s.split(",");
+		if(ss.length > 0) {
+			for(int i = 0; i < 26; i++) {
+				mInitialStat[i] = Integer.valueOf(ss[i]);
+			}
+		}
 	}
 	
 	public void onNewGame(View v) {
@@ -117,8 +177,8 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 		mScore = 0;
 		mScoreView.setText(String.valueOf(0));
 		mText = mDBH.getText(RNG.nextInt(56088));
-		mKeyboard.setText(mText.charAt(mText.length()-1));
-		//mHistory.put(mText, Boolean.valueOf(true));
+		mKeyboard.setText(String.valueOf(mText.charAt(mText.length()-1)));
+		mKeyboard.setSelection(1);
 		mWordView.setText("");
 		mStatus = GAME_ONGOING;
 		mLengthSpan[0] = mLengthSpan[1] = mLengthSpan[2] = 0;
@@ -127,25 +187,177 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 		}
 	}
 	
-	protected void startGame() {
-		if(mStatus == GAME_ONGOING) {
-			new AlertDialog.Builder(HomeActivity.this)
-		    .setTitle(R.string.new_game)
-		    .setMessage(R.string.reset_ask1)
-		    .setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
+	@Override
+	public void onPause() {
+		super.onPause();
+		SharedPreferences.Editor editor = SP.edit();
+		editor.putInt(HomeActivity.ITEM_GAME_STATUS, mStatus);
+		if(mStatus == GAME_OVER) {
+			return;
+		}
+		editor.putInt(HomeActivity.ITEM_GAME_SCORE, mScore);
+		editor.putString(HomeActivity.ITEM_LAST_WORD, mText);
+		editor.putString(HomeActivity.ITEM_USER_INPUT, mKeyboard.getText().toString());
+		editor.putInt("STAT0", mLengthSpan[0]);
+		editor.putInt("STAT1", mLengthSpan[1]);
+		editor.putInt("STAT2", mLengthSpan[2]);
+		String value = "";
+		for(int i : mInitialStat) {
+			value += String.valueOf(i) + ",";
+		}
+		editor.putString("STATInit", value);
+		editor.commit();
+		
+		try {
+			FileOutputStream fos = openFileOutput(DATA_FILE, Context.MODE_PRIVATE);
+			fos.write("".getBytes());
+			for(String s : mHistory.keySet()) {
+				fos.write((s + "\n").getBytes());
+			}
+			fos.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		mGSM.saveProgress();
+		if(mUseGoogleService) {
+			mGSM.saveLocal();
+		}
+	}
+	
+	public boolean onSubmit(final String text) {
+		if(mDBH.checkText(text) == false) {
+			onGameOver();
+			return false;
+		}
+		else if(mHistory.containsKey(text)) {			
+			new AlertDialog.Builder(this)
+		    .setTitle(R.string.repeat_title)
+		    .setMessage(R.string.repeat_input)
+		    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int which) { 
-		        	mStatus = GAME_OVER;
-		        	switchFragment();
-		        }
-		     })
-
-		    .setNegativeButton(R.string.resume_game, new DialogInterface.OnClickListener() {
-		        public void onClick(DialogInterface dialog, int which) { 
-		        	mStatus = GAME_ONGOING;
-		        	switchFragment();
+		            mKeyboard.setText(text.substring(0, 1));
+		            mKeyboard.setSelection(1);
 		        }
 		     })
 		     .show();
+			return false;
+		}
+		int bonus,
+			len = text.length();
+		bonus = len / 6;
+		if(bonus >= mBonusSpan.length) {
+			bonus = mBonusSpan.length - 1;
+		}
+		mLengthSpan[bonus] += 1;
+		mInitialStat[text.charAt(0)-'a'] += 1;
+		mHistory.put(text, Boolean.valueOf(true));
+		mText = text;
+		mScore += len;
+		if(bonus > 0) {
+			mBonusView.setText("+"+mBonusSpan[bonus]);
+			mScore += mBonusSpanInt[bonus];
+		}
+		mGSM.onCheck(this, text, (len+mBonusSpanInt[bonus]), false);
+		mScoreView.setText(String.valueOf(mScore));
+		mWordView.setText(text);
+		mKeyboard.setText(String.valueOf(text.charAt(text.length()-1)));
+		mKeyboard.setSelection(1);
+		return true;
+	}
+
+	
+	public void onGameOver() {
+		int min, max, minIndex, maxIndex;
+		String text;
+		max = mInitialStat[0];
+		min = 1000000;
+		minIndex = maxIndex = 0;
+		for(int i = 1; i < 26; ++i) {
+			if(max < mInitialStat[i] ){
+				max = mInitialStat[i];
+				maxIndex = i;
+			}
+			else if(min > mInitialStat[i] && mInitialStat[i]>0) {
+				min = mInitialStat[i];
+				minIndex = i; 
+			}
+		}
+		if(min == 1000000) {
+			min = 0;
+		}
+		text = mSentences[0];
+		if(max> 0) {
+			 text += mSentences[1] + String.valueOf((char)(maxIndex+'A')) + " ("+String.valueOf(max) +")";
+		}
+		if(min>0) {
+			  text += mSentences[2] + String.valueOf((char)(minIndex + 'A')) + " ("+String.valueOf(min) +")";
+		}
+		text =	text  
+			  +mSentences[3] + String.valueOf(mLengthSpan[2])
+			  +mSentences[4] + String.valueOf(mLengthSpan[1])
+			  +mSentences[5] + String.valueOf(mLengthSpan[0]);
+		new AlertDialog.Builder(this)
+	    .setTitle(R.string.game_over)
+	    .setMessage(text)
+	    .setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) { 
+	            resetGame();
+	        }
+	     })
+	    .setNegativeButton(R.string.leaderboard, new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) { 
+	            onLeaderboard(null);
+	        }
+	     })
+	     .setNeutralButton(R.string.share, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				onShare(null);
+			}
+		})
+	    .show();
+		mHistory.clear();
+		mStatus = GAME_OVER;
+		if(mScore > mBest) {
+			SharedPreferences.Editor editor = HomeActivity.SP.edit();
+			editor.putInt(HomeActivity.ITEM_GAME_BEST, mScore);
+			editor.commit();
+			mBest = mScore;
+		}
+		mGSM.gameOverCheck(this, mScore);
+		mGSM.reset();
+		mScore = 0;
+	}
+	
+//	protected void startGame() {
+//		if(mStatus == GAME_ONGOING) {
+//			new AlertDialog.Builder(HomeActivity.this)
+//		    .setTitle(R.string.new_game)
+//		    .setMessage(R.string.reset_ask1)
+//		    .setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
+//		        public void onClick(DialogInterface dialog, int which) { 
+//		        	mStatus = GAME_OVER;
+//		        	switchFragment();
+//		        }
+//		     })
+//
+//		    .setNegativeButton(R.string.resume_game, new DialogInterface.OnClickListener() {
+//		        public void onClick(DialogInterface dialog, int which) { 
+//		        	mStatus = GAME_ONGOING;
+//		        	switchFragment();
+//		        }
+//		     })
+//		     .show();
+//		}
+//		
+//	}
+	
+	public void onButtonClicked(View view) {
+		switch(view.getId()) {
+		case R.id.fab:
+			onSubmit(mKeyboard.getText().toString());
+			break;
 		}
 		
 	}
@@ -253,14 +465,6 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 		sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getText(R.string.share_content));
 		sendIntent.setType("text/plain");
 		startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		if(mUseGoogleService) {
-			mGSM.saveLocal();
-		}
 	}
 	
 	public class GameServiceManager {
@@ -555,31 +759,73 @@ public class HomeActivity extends BaseGameActivity implements GameFragment.GameL
 		
 	}
 	
+//	@Override
+//	public void onCheck(String text, int score, boolean deleted) {
+//		mGSM.onCheck(this, text, score, deleted);
+//		
+//	}
+//
+//	@Override
+//	public void onGameOver(int score) {
+//		mGSM.gameOverCheck(this, score);
+//		mGSM.reset();
+//	}
+//
+//	@Override
+//	public void saveProgress() {
+//		mGSM.saveProgress();		
+//	}
+//
+//	@Override
+//	public void loadProgress() {
+//		mGSM.loadProgress();
+//		
+//	}
+//
+//	@Override
+//	public void reset() {
+//		mGSM.reset();
+//	}
+
 	@Override
-	public void onCheck(String text, int score, boolean deleted) {
-		mGSM.onCheck(this, text, score, deleted);
+	public void onAnimationEnd(Animation animation) {
+		if(mAniStarted) {
+			mIgnoreAni = true;
+			mAniStarted=false;
+			mBonusView.setText(null);
+		}
+	}
+
+	@Override
+	public void onAnimationRepeat(Animation animation) {}
+
+	@Override
+	public void onAnimationStart(Animation animation) {
+		if(!mIgnoreAni) {
+			mAniStarted = true;
+			mIgnoreAni = false;
+		}
+		else {
+			mIgnoreAni = false;
+		}
 		
 	}
 
 	@Override
-	public void onGameOver(int score) {
-		mGSM.gameOverCheck(this, score);
-		mGSM.reset();
+	public void afterTextChanged(Editable s) {
+		if(s.toString().length() == 1) {
+			mFirstLetter = s.toString();
+		}
+		else if(s.toString().length() == 0) {
+			mKeyboard.setText(mFirstLetter);
+			mKeyboard.setSelection(1);
+		}
 	}
 
 	@Override
-	public void saveProgress() {
-		mGSM.saveProgress();		
-	}
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {	}
 
 	@Override
-	public void loadProgress() {
-		mGSM.loadProgress();
-		
-	}
-
-	@Override
-	public void reset() {
-		mGSM.reset();
-	}
+	public void onTextChanged(CharSequence s, int start, int before, int count) {	}
 }

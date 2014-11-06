@@ -1,9 +1,11 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppBaseTheme" parent="android:Theme.Light">
+    <style name="AppBaseTheme" parent="android:Theme.Light.NoTitleBar">
+        
     </style>
 
     <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:editTextStyle">@style/editTextStyle</item>
     </style>
 
     <style name="TA">
@@ -24,6 +26,11 @@
     
     <style name="TA.Headline">
         <item name="android:textSize">24sp</item>
+    </style>
+    
+    <style name="editTextStyle" parent="@style/android:Widget.EditText">
+        <item name="android:background">@drawable/input_line</item>
+        <item name="android:paddingBottom">8dp</item>
     </style>
     
 </resources>
