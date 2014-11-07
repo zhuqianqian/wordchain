@@ -21,12 +21,14 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
@@ -106,7 +108,10 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 			mKeyboard.setText(s);
 			mKeyboard.setSelection(s.length());
 			restoreHistory();
+			mWordView.setText(mText);
 			mGSM.loadProgress();
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(mKeyboard, InputMethodManager.SHOW_IMPLICIT);
 		}
 		else {
 			resetGame();
@@ -118,8 +123,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		mBonusView.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
 		Animation ani = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
 		ani.setAnimationListener(this);
-		mBonusView.setOutAnimation(ani);
-		mWordView.setText(mText);
+		mBonusView.setOutAnimation(ani);		
 	}
 	
 	protected void restoreHistory() {
@@ -177,11 +181,15 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		mScore = 0;
 		mScoreView.setText(String.valueOf(0));
 		mText = mDBH.getText(RNG.nextInt(56088));
+		mKeyboard.setEnabled(true);
 		mKeyboard.setText(String.valueOf(mText.charAt(mText.length()-1)));
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.showSoftInput(mKeyboard, InputMethodManager.SHOW_IMPLICIT);
 		mKeyboard.setSelection(1);
 		mWordView.setText("");
 		mStatus = GAME_ONGOING;
 		mLengthSpan[0] = mLengthSpan[1] = mLengthSpan[2] = 0;
+		mBestView.setText(String.valueOf(mBest));
 		for(int i = 0; i < 26; i++) {
 			mInitialStat[i] = 0;
 		}
@@ -191,13 +199,14 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 	public void onPause() {
 		super.onPause();
 		SharedPreferences.Editor editor = SP.edit();
-		editor.putInt(HomeActivity.ITEM_GAME_STATUS, mStatus);
+		editor.putInt(ITEM_GAME_STATUS, mStatus);
 		if(mStatus == GAME_OVER) {
+			editor.commit();
 			return;
 		}
-		editor.putInt(HomeActivity.ITEM_GAME_SCORE, mScore);
-		editor.putString(HomeActivity.ITEM_LAST_WORD, mText);
-		editor.putString(HomeActivity.ITEM_USER_INPUT, mKeyboard.getText().toString());
+		editor.putInt(ITEM_GAME_SCORE, mScore);
+		editor.putString(ITEM_LAST_WORD, mText);
+		editor.putString(ITEM_USER_INPUT, mKeyboard.getText().toString());
 		editor.putInt("STAT0", mLengthSpan[0]);
 		editor.putInt("STAT1", mLengthSpan[1]);
 		editor.putInt("STAT2", mLengthSpan[2]);
@@ -273,6 +282,14 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		max = mInitialStat[0];
 		min = 1000000;
 		minIndex = maxIndex = 0;
+		mStatus = GAME_OVER;
+		mKeyboard.setEnabled(false);
+		int ids[] = {R.string.not_a_word, R.string.max_used, R.string.min_used,
+				 R.string.word_count_12, R.string.word_count_6, R.string.word_count_1};
+		Resources r = getResources();
+		for(int i = 0; i < ids.length; ++i) {
+			mSentences[i] = r.getString(ids[i]);
+		}
 		for(int i = 1; i < 26; ++i) {
 			if(max < mInitialStat[i] ){
 				max = mInitialStat[i];
@@ -318,7 +335,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		})
 	    .show();
 		mHistory.clear();
-		mStatus = GAME_OVER;
+		
 		if(mScore > mBest) {
 			SharedPreferences.Editor editor = HomeActivity.SP.edit();
 			editor.putInt(HomeActivity.ITEM_GAME_BEST, mScore);
@@ -330,33 +347,22 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		mScore = 0;
 	}
 	
-//	protected void startGame() {
-//		if(mStatus == GAME_ONGOING) {
-//			new AlertDialog.Builder(HomeActivity.this)
-//		    .setTitle(R.string.new_game)
-//		    .setMessage(R.string.reset_ask1)
-//		    .setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
-//		        public void onClick(DialogInterface dialog, int which) { 
-//		        	mStatus = GAME_OVER;
-//		        	switchFragment();
-//		        }
-//		     })
-//
-//		    .setNegativeButton(R.string.resume_game, new DialogInterface.OnClickListener() {
-//		        public void onClick(DialogInterface dialog, int which) { 
-//		        	mStatus = GAME_ONGOING;
-//		        	switchFragment();
-//		        }
-//		     })
-//		     .show();
-//		}
-//		
-//	}
-	
 	public void onButtonClicked(View view) {
 		switch(view.getId()) {
 		case R.id.fab:
 			onSubmit(mKeyboard.getText().toString());
+			break;
+			
+		case R.id.new_game:
+			onNewGame(view);
+			break;
+			
+		case R.id.share:
+			onShare(view);
+			break;
+			
+		case R.id.overflow:
+			onOverflowMenu(view);
 			break;
 		}
 		
@@ -413,6 +419,19 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		else {
 			batchUpdate();			
 		}	
+	}
+	
+	public void onOverflowMenu(View view) {
+		
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_MENU) {
+	        onOverflowMenu(null);
+	        return true;
+	    }
+	    return super.onKeyUp(keyCode, event);
 	}
 	
 	@Override
@@ -758,34 +777,6 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		}
 		
 	}
-	
-//	@Override
-//	public void onCheck(String text, int score, boolean deleted) {
-//		mGSM.onCheck(this, text, score, deleted);
-//		
-//	}
-//
-//	@Override
-//	public void onGameOver(int score) {
-//		mGSM.gameOverCheck(this, score);
-//		mGSM.reset();
-//	}
-//
-//	@Override
-//	public void saveProgress() {
-//		mGSM.saveProgress();		
-//	}
-//
-//	@Override
-//	public void loadProgress() {
-//		mGSM.loadProgress();
-//		
-//	}
-//
-//	@Override
-//	public void reset() {
-//		mGSM.reset();
-//	}
 
 	@Override
 	public void onAnimationEnd(Animation animation) {

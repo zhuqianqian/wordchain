@@ -24,7 +24,9 @@
             android:scaleType="fitStart"
             android:src="@drawable/ic_launcher"/>
         
-        <ImageView android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/new_game" 
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:contentDescription="@string/new_game"
@@ -32,7 +34,9 @@
             android:src="@drawable/games_new_white"
             android:onClick="onButtonClicked"/>
         
-        <ImageView android:layout_width="wrap_content"
+        <ImageView 
+            android:id="@+id/share"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
@@ -102,6 +106,7 @@
             android:textAppearance="@style/TA.Subhead"
             />
         <TextView 
+            android:id="@+id/overflow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/bonus"
@@ -133,7 +138,7 @@
         android:layout_below="@id/word"
         android:gravity="center_horizontal"
         android:textAppearance="@style/TA.Display1"
-        android:inputType="textVisiblePassword"
+        android:inputType="textEmailAddress"
         />
     
     <ImageButton android:id="@+id/fab"
