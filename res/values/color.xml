@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- #<alpha><R><G><B> -->   
-    <color name="background">#ff28a232</color>
-    <color name="white">#ffffffff</color>
-    <color name="key_pressed">#ff7cc1fe</color>
+    <color name="background"> #4caf50</color>
     <color name="bonus">#ffff0000</color>
     
-    <color name="primary">#ff5722</color>
-    <color name="primary_darker">#e64a19</color>
-    <color name="accent">#ff5722</color>
+    <color name="primary">#4db6ac</color>
+    <color name="primary_darker">#009688</color>
+    <color name="accent">#4db6ac</color>
     
      <color name="btn_disabled_light">#1a999999</color>
      <color name="text_black_std">#de000000</color>

@@ -5,6 +5,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="actionbarSize">56dp</dimen>
     
-    <dimen name="fab_size">60dp</dimen>
+    <dimen name="fab_size">40dp</dimen>
 	<dimen name="bonus_margin">16dp</dimen>
 </resources>

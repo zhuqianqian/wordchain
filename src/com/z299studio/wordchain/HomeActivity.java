@@ -19,19 +19,26 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.drawable.BitmapDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnKeyListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.PopupWindow;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 public class HomeActivity extends BaseGameActivity implements AnimationListener, TextWatcher{
 	
@@ -66,10 +73,11 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 	private int mScore, mBest;
 	private String mText;
 	private String mFirstLetter;
+	private View mOverflow;
 	private Hashtable<String, Boolean> mHistory = new Hashtable<String, Boolean>();
-	private static final Random RNG = new Random();
-	
-
+	private static final Random RNG = new Random();	
+	private PopupWindow mPopup;
+	private int mLastLength;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -84,7 +92,6 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		try {
 			mDBH.createDatabase();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		initUiControls();
@@ -99,7 +106,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		mBestView = (TextView)findViewById(R.id.best);
 		mBest = SP.getInt(ITEM_GAME_BEST, 0);
 		mBestView.setText(String.valueOf(mBest));
-		
+		mOverflow = findViewById(R.id.overflow);
 		if(mStatus == GAME_ONGOING) {
 			mText = HomeActivity.SP.getString(HomeActivity.ITEM_LAST_WORD, "hello");
 			mScore = HomeActivity.SP.getInt(HomeActivity.ITEM_GAME_SCORE, 0);			
@@ -110,8 +117,6 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 			restoreHistory();
 			mWordView.setText(mText);
 			mGSM.loadProgress();
-			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.showSoftInput(mKeyboard, InputMethodManager.SHOW_IMPLICIT);
 		}
 		else {
 			resetGame();
@@ -123,7 +128,19 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		mBonusView.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
 		Animation ani = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
 		ani.setAnimationListener(this);
-		mBonusView.setOutAnimation(ani);		
+		mBonusView.setOutAnimation(ani);
+		
+		mKeyboard.setOnEditorActionListener(new OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView edit, int id, KeyEvent event) {
+				if(id == EditorInfo.IME_ACTION_DONE) {
+					onSubmit(edit.getText().toString());
+					return true;
+				}
+				return false;
+			}
+		});
 	}
 	
 	protected void restoreHistory() {
@@ -178,6 +195,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 	
 	protected void resetGame() {
 		mHistory.clear();
+		mLastLength = 0;
 		mScore = 0;
 		mScoreView.setText(String.valueOf(0));
 		mText = mDBH.getText(RNG.nextInt(56088));
@@ -198,6 +216,10 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 	@Override
 	public void onPause() {
 		super.onPause();
+		mKeyboard.clearFocus();
+		InputMethodManager imm = (InputMethodManager)getSystemService(
+			      Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(mKeyboard.getWindowToken(), 0);
 		SharedPreferences.Editor editor = SP.edit();
 		editor.putInt(ITEM_GAME_STATUS, mStatus);
 		if(mStatus == GAME_OVER) {
@@ -255,6 +277,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		int bonus,
 			len = text.length();
 		bonus = len / 6;
+		mLastLength = 0;
 		if(bonus >= mBonusSpan.length) {
 			bonus = mBonusSpan.length - 1;
 		}
@@ -362,10 +385,23 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 			break;
 			
 		case R.id.overflow:
-			onOverflowMenu(view);
+			onOverflow(mOverflow);
 			break;
+			
+		case R.id.action_achieve:
+			mPopup.dismiss();
+			onAchievement(view);			
+			break;
+			
+		case R.id.action_lb:
+			mPopup.dismiss();
+			onLeaderboard(view);
+			break;
+			
+		case R.id.action_rate:
+			mPopup.dismiss();
+			onRate(view);
 		}
-		
 	}
 	
 	public void onAchievement(View v) {
@@ -380,9 +416,22 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 	}
 	
 	@Override
+	protected void onResume() {
+		super.onResume();
+		mKeyboard.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				mKeyboard.requestFocus();
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(mKeyboard, InputMethodManager.SHOW_FORCED);
+			}}, 
+			100);
+	}
+	
+	@Override
 	public void onStart() {
 		super.onStart();
-		mGSM.loadProgress();
+		mGSM.loadProgress();		
 	}
 	
 	public void onLeaderboard(View v) {
@@ -398,9 +447,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.home, menu);
-		return true;
+		return false;
 	}
 
 	@Override
@@ -421,51 +468,13 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		}	
 	}
 	
-	public void onOverflowMenu(View view) {
-		
-	}
-	
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 	    if (keyCode == KeyEvent.KEYCODE_MENU) {
-	        onOverflowMenu(null);
+	    	onOverflow(mOverflow);
 	        return true;
 	    }
 	    return super.onKeyUp(keyCode, event);
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle presses on the action bar items
-	    switch (item.getItemId()) {
-	    case R.id.action_achieve:
-	    	onAchievement(null);
-	    	return true;
-	    	
-	    case R.id.action_lb:
-	    	onLeaderboard(null);
-	    	return true;
-	    	
-	    case R.id.action_new:
-	    	onNewGame(null);
-	    	return true;
-	    case R.id.action_rate:
-	    	onRate(null);
-	    	return true;
-	    	
-	    case R.id.action_share:
-	    	onShare(null);
-	    	break;
-	    	
-	    case android.R.id.home: {
-	    	onBackPressed();
-	    	}
-	    	break;
-	    
-	    default:
-	            return super.onOptionsItemSelected(item);
-	    }
-	    return true;
 	}
 	
 	public void onRate(View v) {
@@ -484,6 +493,29 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		sendIntent.putExtra(Intent.EXTRA_TEXT, getResources().getText(R.string.share_content));
 		sendIntent.setType("text/plain");
 		startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
+	}
+	
+	public void onOverflow(View view) {		
+		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
+		View layout = inflater.inflate(R.layout.abomenu, (ViewGroup)findViewById(R.id.popup_root));
+		PopupWindow popupWindow = new PopupWindow(layout, LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT, true);
+		popupWindow.setOutsideTouchable(true);
+		popupWindow.setBackgroundDrawable(new BitmapDrawable());	
+		popupWindow.getContentView().setFocusableInTouchMode(true);
+		popupWindow.setAnimationStyle(R.style.popupAnimation);
+		popupWindow.getContentView().setOnKeyListener(new OnKeyListener() {
+			@Override
+			public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+				if(keyCode == KeyEvent.KEYCODE_MENU &&
+						keyEvent.getAction() == KeyEvent.ACTION_UP) {
+					mPopup.dismiss();
+					return true;
+				}
+				return false;
+			}});
+		mPopup = popupWindow;
+		popupWindow.showAsDropDown(view, 0, 0);
 	}
 	
 	public class GameServiceManager {
@@ -774,8 +806,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 					Games.Achievements.unlock(getApiClient(), mGSM.mAchievements[i]);
 				}
 			}
-		}
-		
+		}		
 	}
 
 	@Override
@@ -804,13 +835,18 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 
 	@Override
 	public void afterTextChanged(Editable s) {
-		if(s.toString().length() == 1) {
+		int length = s.toString().length();
+		if(length == 1) {
 			mFirstLetter = s.toString();
 		}
-		else if(s.toString().length() == 0) {
+		else if(length == 0) {
 			mKeyboard.setText(mFirstLetter);
 			mKeyboard.setSelection(1);
 		}
+		if(length < mLastLength) {
+			mGSM.onCheck(this, null, 0, true);
+		}
+		mLastLength = length;
 	}
 
 	@Override
@@ -819,4 +855,5 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {	}
+
 }

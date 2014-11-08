@@ -18,4 +18,8 @@
     
     <style name="TA.Headline" parent="@android:style/TextAppearance.Material.Headline"/>
 
+    <style name="menuButtonStyle" parent="@android:style/Widget.Material.Button.Borderless">
+        <item name="android:gravity">left|center_vertical</item>
+    </style>
+ 
 </resources>

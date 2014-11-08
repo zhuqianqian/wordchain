@@ -33,4 +33,21 @@
         <item name="android:paddingBottom">8dp</item>
     </style>
     
+    <style name="menuButtonStyle" parent="@style/android:Widget.Button">
+        <item name="android:background">@drawable/abmenu</item>
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+    
+    <style name="abMenuItem">
+        <item name="android:background">@drawable/abmenu</item>
+    </style>
+    
+    <style name="popupAnimation">
+        <item name="android:windowEnterAnimation">@anim/expand_from_tr</item>
+        <item name="android:windowExitAnimation">@anim/shrink_to_tr</item>
+    </style>
 </resources>

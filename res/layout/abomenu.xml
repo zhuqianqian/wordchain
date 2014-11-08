@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/primary"
+    android:id="@+id/popup_root"
+    tools:context=".HomeActivity" >
+
+    <Button android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/action_lb"
+        android:drawableLeft="@drawable/ic_leaderboard"
+        android:text="@string/leaderboard"
+        android:drawablePadding="8dp"
+        style="@style/menuButtonStyle"
+        android:onClick="onButtonClicked"
+        />
+    <Button android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/action_achieve"
+        android:text="@string/achievements"
+        android:drawableLeft="@drawable/ic_achievements"
+        android:drawablePadding="8dp"
+        style="@style/menuButtonStyle"
+        android:onClick="onButtonClicked"
+        />
+    <Button android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/action_rate"
+        android:text="@string/rate"
+        android:drawableLeft="@drawable/ic_rate"
+        android:drawablePadding="8dp"
+        style="@style/menuButtonStyle"
+        android:onClick="onButtonClicked"
+        />
+    
+</LinearLayout>
