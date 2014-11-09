@@ -21,6 +21,7 @@
     <string name="share_content">I am playing Word Chain to challenge my vocabulary.\n\nSee it at Play Store: https://play.google.com/store/apps/details?id=com.z299studio.wordchain</string>
     
     <string name="repeat_title">Repeat Word</string>
+    <string name="invalid_word">Invalid Choice</string>
     <string name="not_a_word">That is NOT an English word.\n\nStatistics\n</string>
     <string name="max_used">\nMost used word initial letter:</string>
     <string name="min_used">\nLeast used word initial letter:</string>
@@ -29,7 +30,7 @@
     <string name="word_count_1">\nWords shorter than 6 letters:</string>
     
     <string name="repeat_input">You have already got this word in this round. Make another choice.</string>
-	
+	<string name="wrong_start">The word does not start with the last letter of %1$s: %2$s.</string>
     <string name="reset_ask1">A saved game is found, are you sure to start a new game?</string>
     <string name="reset_ask2">The current progress will be discarded, are you sure to start a new game?</string>
     

@@ -257,6 +257,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 	}
 	
 	public boolean onSubmit(final String text) {
+		final String lastLetter = mText.substring(mText.length() - 1, mText.length());
 		if(mDBH.checkText(text) == false) {
 			onGameOver();
 			return false;
@@ -267,7 +268,20 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		    .setMessage(R.string.repeat_input)
 		    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int which) { 
-		            mKeyboard.setText(text.substring(0, 1));
+		            mKeyboard.setText(lastLetter);
+		            mKeyboard.setSelection(1);
+		        }
+		     })
+		     .show();
+			return false;
+		}
+		else if(mText.charAt(mText.length()-1) != text.charAt(0)) {
+			new AlertDialog.Builder(this)
+		    .setTitle(R.string.invalid_word)
+		    .setMessage(getResources().getString(R.string.wrong_start, mText, lastLetter))
+		    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) { 
+		            mKeyboard.setText(lastLetter);
 		            mKeyboard.setSelection(1);
 		        }
 		     })
