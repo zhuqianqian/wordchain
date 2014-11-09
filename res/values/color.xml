@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- #<alpha><R><G><B> -->   
-    <color name="background"> #4caf50</color>
+    <color name="background">#8bc34a</color>
     <color name="bonus">#ffff0000</color>
     
     <color name="primary">#4db6ac</color>
