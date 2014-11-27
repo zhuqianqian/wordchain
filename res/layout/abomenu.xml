@@ -10,6 +10,8 @@
 
     <Button android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
         android:id="@+id/action_lb"
         android:drawableLeft="@drawable/ic_leaderboard"
         android:text="@string/leaderboard"
@@ -19,6 +21,8 @@
         />
     <Button android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"        
         android:id="@+id/action_achieve"
         android:text="@string/achievements"
         android:drawableLeft="@drawable/ic_achievements"
@@ -28,6 +32,8 @@
         />
     <Button android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"        
         android:id="@+id/action_rate"
         android:text="@string/rate"
         android:drawableLeft="@drawable/ic_rate"

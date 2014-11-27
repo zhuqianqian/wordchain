@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">單詞接龍</string>
+    <string name="score">當前得分</string>
+    <string name="best">高分記錄</string>
+    <string name="new_game">新遊戲</string>
+    <string name="achievements">成就</string>
+    <string name="leaderboard">高分榜</string>
+    <string name="game_over">遊戲結束！</string>
+    <string name="share">分享</string>
+    <string name="rate">意見反映</string>
+    <string name="ok">確定</string>
+    <string name="send_to">傳送到：</string>
+    <string name="share_content">我正在玩單詞接龍遊戲，挑戰詞匯量！\n\n可以從Play商店安裝：https://play.google.com/store/apps/details?id=com.z299studio.wordchain</string>
+    <string name="repeat_title">重複的輸入</string>
+    <string name="invalid_word">無效的選擇</string>
+    <string name="not_a_word">你輸入的不是一個英文單詞。\n\n統計訊息\n</string>
+    <string name="max_used">\n使用最多的首字母：</string>
+    <string name="min_used">\n使用最少的首字母：</string>
+    <string name="word_count_12">\n長度逾過12個字母的單詞數量：</string>
+    <string name="word_count_6">\n長度在5—12個字母之間的單詞數量：</string>
+    <string name="word_count_1">\n長度不足6個字母的單詞數量：</string>
+    <string name="repeat_input">你已經使用過這個單詞，換一個吧~</string>
+    <string name="wrong_start">這個單詞沒有以前面一個單詞（%1$s）的末尾字母%2$s做為首字母。</string>
+    <string name="reset_ask2">確定要丟棄當前遊戲進度開戶新的遊戲嗎？</string>
+</resources>
