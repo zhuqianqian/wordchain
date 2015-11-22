@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion android_compile_version
+    buildToolsVersion android_version
 
     defaultConfig {
         applicationId "com.z299studio.wordchain"
-        minSdkVersion 10
-        targetSdkVersion 23
+        minSdkVersion android_min_sdk_version
+        targetSdkVersion android_tgt_sdk_version
     }
 
     buildTypes {
@@ -16,8 +16,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-
-    android_compile_version
 
     dependencies {
         compile project(':BaseGameUtils')

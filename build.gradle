@@ -17,6 +17,7 @@ allprojects {
         android_compile_version = 23
         android_version = '23.0.1'
         android_min_sdk_version = 10
+        android_tgt_sdk_version = 23
 
         appcompat_library_version = '23.0.1'
         support_library_version = '23.0.1'
