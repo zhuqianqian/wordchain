@@ -44,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			try {
 				copyDatabase();
 			} catch (IOException e) {
+				Log.e("WordChain", "Failed to create Dictionary database.");
 				throw e; 
 			}
 		}
@@ -95,6 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if(cursor.moveToFirst()) {
 			ret = cursor.getString(index);			
 		}
+		cursor.close();
 		return ret;
 	}
 	
@@ -103,6 +105,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		String where = "word = ?";
 		String arg[] = {text};
 		Cursor cursor = mDB.query(TABLE_EN, columns, where, arg, null, null, null);
-		return cursor.moveToFirst();
+		boolean hasData =  cursor.moveToFirst();
+		cursor.close();
+		return hasData;
 	}
 }

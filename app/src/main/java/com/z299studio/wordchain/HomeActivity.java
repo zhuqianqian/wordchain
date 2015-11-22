@@ -74,7 +74,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 	private String mText;
 	private String mFirstLetter;
 	private View mOverflow;
-	private Hashtable<String, Boolean> mHistory = new Hashtable<String, Boolean>();
+	private Hashtable<String, Boolean> mHistory = new Hashtable<>();
 	private static final Random RNG = new Random();	
 	private PopupWindow mPopup;
 	private int mLastLength;
@@ -154,7 +154,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 			String s = new String(buffer, "UTF-8");
 			String keys[] = s.split("\n");
 			for(String k : keys) {
-				mHistory.put(k, Boolean.valueOf(true));
+				mHistory.put(k, true);
 			}
 			
 		} catch (Exception e) {
@@ -223,7 +223,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		SharedPreferences.Editor editor = SP.edit();
 		editor.putInt(ITEM_GAME_STATUS, mStatus);
 		if(mStatus == GAME_OVER) {
-			editor.commit();
+			editor.apply();
 			return;
 		}
 		editor.putInt(ITEM_GAME_SCORE, mScore);
@@ -237,7 +237,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 			value += String.valueOf(i) + ",";
 		}
 		editor.putString("STATInit", value);
-		editor.commit();
+		editor.apply();
 		
 		try {
 			FileOutputStream fos = openFileOutput(DATA_FILE, Context.MODE_PRIVATE);
@@ -258,7 +258,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 	
 	public boolean onSubmit(final String text) {
 		final String lastLetter = mText.substring(mText.length() - 1, mText.length());
-		if(mDBH.checkText(text) == false) {
+		if(!mDBH.checkText(text)) {
 			onGameOver();
 			return false;
 		}
@@ -297,7 +297,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		}
 		mLengthSpan[bonus] += 1;
 		mInitialStat[text.charAt(0)-'a'] += 1;
-		mHistory.put(text, Boolean.valueOf(true));
+		mHistory.put(text, true);
 		mText = text;
 		mScore += len;
 		if(bonus > 0) {
@@ -376,7 +376,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		if(mScore > mBest) {
 			SharedPreferences.Editor editor = HomeActivity.SP.edit();
 			editor.putInt(HomeActivity.ITEM_GAME_BEST, mScore);
-			editor.commit();
+			editor.apply();
 			mBest = mScore;
 		}
 		mGSM.gameOverCheck(this, mScore);
@@ -473,8 +473,8 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 		if(!mUseGoogleService) {
 			SharedPreferences.Editor edit = SP.edit();
 			mUseGoogleService = true;
-			edit.putBoolean(ITEM_GOOGLE_GAMES, mUseGoogleService);
-			edit.commit();
+			edit.putBoolean(ITEM_GOOGLE_GAMES, true);
+			edit.apply();
 			mGSM = new GameServiceManager(this);
 		}
 		else {
@@ -553,8 +553,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 				R.string.achievement_word_master,  // 14
 				R.string.achievement_second_perfect_chain  // 15
 		};
-		public static final int NUMBER_NEWBIE = 5;
-		public static final int NUMBER_LOVER = 20;
+
 		public String[] mAchievements;
 		public int[] mUnsync;
 		public String LB_ID;
@@ -614,7 +613,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 				}
 			}
 			editor.putInt("HighScore", mHighScore);
-			editor.commit();
+			editor.apply();
 		}
 		
 		public void saveProgress() {
@@ -633,7 +632,7 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 					}
 				}
 				editor.putString("A2ZKeys", value);
-				editor.commit();
+				editor.apply();
 			}
 		}
 		
@@ -740,8 +739,8 @@ public class HomeActivity extends BaseGameActivity implements AnimationListener,
 					unlockAchievement(mAchievements[3], 3);
 				}
 				if(mUnsync[0] == 0) {
-					if(!mInitials[(int)(c - 'a')]) {
-						mInitials[(int)(c - 'a')] = true;
+					if(!mInitials[(c - 'a')]) {
+						mInitials[(c - 'a')] = true;
 						mInitialCount++;
 					}
 					if(mInitialCount == 26) {
