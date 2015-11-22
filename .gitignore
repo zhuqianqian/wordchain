@@ -41,7 +41,10 @@ proguard/
 /libs/android-support-v13.jar
 
 # IDs.
-*/values/ids.xml
+*games-ids.xml
 
 # Android Studio Import ADT project summary
 import-summary.txt
+
+# BaseGameUtil library module.
+BaseGameUtils/

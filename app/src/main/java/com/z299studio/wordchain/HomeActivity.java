@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Random;
 
-import com.google.android.gms.games.Games;
-import com.google.example.games.basegameutils.BaseGameActivity;
-
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.AlertDialog;
@@ -39,6 +36,9 @@ import android.widget.PopupWindow;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+
+import com.google.android.gms.games.Games;
+import com.google.example.games.basegameutils.BaseGameActivity;
 
 public class HomeActivity extends BaseGameActivity implements AnimationListener, TextWatcher{
 	
